@@ -12,6 +12,17 @@ const books = [
       category: ["tech", "education", "thriller"],
     },
 
+    {
+        ISBN: "98765book",
+        title: "crazy business ideas",
+        pubDate: "2021-09-09",
+        language: "Ru",
+        numPage: 300,
+        author: [1, 2],
+        publication: [1],
+        category: ["business", "education", "romance"],
+      },
+
 
 ];
 
@@ -21,7 +32,7 @@ const books = [
 const authors = [
     {
     id: 1,
-    name: "Pavan",
+    name: "pavan",
     books:["12345Book", "12345678Secret"],
     },
 
@@ -41,6 +52,13 @@ const publication =[
     books: ["12345Book"], 
 
     },
+
+    {   
+        id: 2,
+        name: "Virgin Publication",
+        books: ["Get lost in the woods"], 
+    
+        },
 ];
 
 module.exports = {books, authors, publication};

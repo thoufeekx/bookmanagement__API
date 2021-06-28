@@ -45,6 +45,32 @@ return res.json({book: getSpecificBook},);
 
 });
 
+/*
+Route               "/lang"
+Description          Get specific book based on language
+Access               PUBLIC 
+parameter            language
+Methods              GET 
+*/
+
+
+booky.get("/lang/:language", (req, res) => {
+    const getSpecificBook = database.books.filter(
+        (book) => book.language === req.params.language);
+
+if(getSpecificBook.length === 0){
+    return res.json({error: `No book found for the language of ${req.params.isbn}`,});
+}
+
+return res.json({book: getSpecificBook},);
+
+});
+
+
+
+
+
+
 
 
 /*
@@ -87,17 +113,17 @@ booky.get("/author", (req, res) => {
 
 
 /*
-Route               "/author/books/:isbn"
+Route               "/authors/books/:isbn"
 Description          Get all author based on books
 Access               PUBLIC
 parameter            isbn
 Methods              GET
 */
- booky.get("/author/book/:isbn", (req, res) =>{
+ booky.get("/authors/book/:isbn", (req, res) =>{
 
 
-    const getSpecificAuthor = database.authors.filter((authors) => 
-    authors.books.includes(req.params.isbn)
+    const getSpecificAuthor = database.authors.filter((author) => 
+    author.books.includes(req.params.isbn)
     );
 
     if(getSpecificAuthor.length === 0){
@@ -107,6 +133,33 @@ Methods              GET
    return res.json({authors: getSpecificAuthor});
 
 });
+
+
+
+
+/*
+Route               "/authors/:names"
+Description          Get specific authors
+Access               PUBLIC
+parameter            names
+Methods              GET
+*/
+booky.get("/authors/:name", (req, res) =>{
+
+
+    const getSpecificAuthor = database.authors.filter(
+         (names) => names.name === req.params.name);
+    
+
+    if(getSpecificAuthor.length === 0){
+       return res.json({error: `No author found for the name of ${req.params.name}`,});
+   }
+
+   return res.json({authors: getSpecificAuthor});
+
+});
+
+
 
 
 
@@ -122,5 +175,33 @@ booky.get("/publication", (req, res) =>
    return res.json({pub: database.publication})
     }
     );
+
+
+
+
+/*
+Route               "/publication/:name"
+Description          Get all publication
+Access               PUBLIC
+parameter            name
+Methods              GET
+*/
+booky.get("/publication/:name", (req, res) =>  {
+
+   const getSpecificPublication = database.publication.filter( 
+       (pubname) => pubname.name === req.params.name);
+   
+
+   if(getSpecificPublication.lenth === 0){
+       return res.json({error: `No publication found with name ${req.params.name}`,});
+   }
+    
+   return res.json({pubname: getSpecificPublication});
+    
+    
+
+
+});
+
 
 booky.listen(3000, () => console.log("Server is runnning in port 3000"));

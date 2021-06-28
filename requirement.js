@@ -25,14 +25,14 @@
 //to get all books                          ✔
 //to get specific books                     ✔
 //to get list of books based on category    ✔
-//to get list of books based on language
+//to get list of books based on language    ✔
 
 
 //Authors
 
 //We need an API                                 
 //To get all authors                        ✔
-//to specific authors
+//to specific authors                       ✔
 //to get list of authors based on books     ✔
 
 
