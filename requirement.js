@@ -40,5 +40,5 @@
 
 //We need an Api 
 //to get all publication                           ✔
-//to get specific publication
-//to get a list of publication based on books
+//to get specific publication                      ✔
+//to get a list of publication based on books      ✔

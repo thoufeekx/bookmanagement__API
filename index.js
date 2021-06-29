@@ -181,7 +181,7 @@ booky.get("/publication", (req, res) =>
 
 /*
 Route               "/publication/:name"
-Description          Get all publication
+Description          Get specific publication with name
 Access               PUBLIC
 parameter            name
 Methods              GET
@@ -192,7 +192,7 @@ booky.get("/publication/:name", (req, res) =>  {
        (pubname) => pubname.name === req.params.name);
    
 
-   if(getSpecificPublication.lenth === 0){
+   if(getSpecificPublication.length === 0){
        return res.json({error: `No publication found with name ${req.params.name}`,});
    }
     
@@ -202,6 +202,39 @@ booky.get("/publication/:name", (req, res) =>  {
 
 
 });
+
+
+
+
+
+
+/*
+Route               "/publication/:pubbook"
+Description          Get publication with book name
+Access               PUBLIC
+parameter            pubbook
+Methods              GET
+*/
+booky.get("/publication/book/:pubbook", (req, res) =>  {
+
+    const getSpecificPublication = database.publication.filter( 
+        (pubbooks) => pubbooks.books.includes(req.params.pubbook)
+    );
+    
+ 
+    if(getSpecificPublication.length === 0){
+        return res.json({error: `No publication found with book name ${req.params.pubbook}`,});
+    }
+     
+    return res.json({pubbooks: getSpecificPublication});
+     
+     
+ 
+ 
+ });
+
+
+
 
 
 booky.listen(3000, () => console.log("Server is runnning in port 3000"));
