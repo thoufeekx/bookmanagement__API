@@ -93,7 +93,7 @@
 
 //PUT
 //update the publication title                     ✔
-// update / add books          
+// update / add books                              ✔
 
 
 //DELETE

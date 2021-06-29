@@ -424,7 +424,39 @@ booky.put("/publication/edit/:names", (req, res)=> {
   return res.json({publication: database.publication})
 
 });
+////////////////////////////////////////////////update publication
+/*
+Route               "/publication/update/book"
+Description          update/add new book to publication
+Access               PUBLIC
+parameter            isbn
+Methods              PUT
+*/
 
+booky.put("/publication/update/book/:isbn", (req, res) => {
 
+    //update the publication data base
+    database.publication.forEach( (publication) => {
+            if(publication.id === req.body.pubId){
+                //if id matches with req id(pubId) then go inside books and push isbn 
+               return publication.books.push(req.params.isbn);
+            }
+
+    });
+
+    //update the book database
+    database.books.forEach( (book) =>{
+
+            if(book.ISBN === req.params.isbn){
+                book.publication = req.body.pubId;
+                return;
+            }
+
+    }); 
+
+    return res.json({books: database.books, publication: database.publication,
+   message: "Succesfully updated publications" });
+
+});
 
 booky.listen(3000, () => console.log("Server is runnning in port 3000"));
