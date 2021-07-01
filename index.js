@@ -1,8 +1,23 @@
+require("dotenv").config();
+
+
+//Frame work
 const express = require("express");
+
+//mongodb something
+const mongoose = require("mongoose");
 
 
 //DataBase
-const database = require("./database");
+const database = require("./dataBase");
+
+//Models
+const BookModel = require("./database/books");
+const AuthorModel = require("./database/author");
+const PublicationModel = require("./database/publication");
+
+
+
 
 //Initialization
 const booky = express();
@@ -10,6 +25,16 @@ const booky = express();
 // configuration
 //telling  server we use json
 booky.use(express.json());
+
+//establish connection for database
+mongoose.connect(process.env.MONGO_URL, {
+    useNewUrlParser: true,
+  useUnifiedTopology: true,
+  useFindAndModify: false,
+  useCreateIndex: true,
+}
+)
+.then( () => console.log("Access Granted Carbon!!!!!"));
 
 
 
@@ -22,9 +47,10 @@ parameter            NONE
 Methods              GET
 */
 
-booky.get("/", (req, res) =>  
+booky.get("/", async (req, res) =>  
     {
-   return res.json({books: database.books});
+        const getAllBooks =  await BookModel.find();
+   return res.json(getAllBooks);
     }
     );
 
@@ -39,11 +65,14 @@ Methods              GET
 */
 
 
-booky.get("/is/:isbn", (req, res) => {
-    const getSpecificBook = database.books.filter(
-        (book) => book.ISBN === req.params.isbn);
+booky.get("/is/:isbn", async (req, res) => {
+   
+      const getSpecificBook = await BookModel.findOne({ISBN: req.params.isbn})
+    // const getSpecificBook = database.books.filter(
+     //   (book) => book.ISBN === req.params.isbn);
 
-if(getSpecificBook.length === 0){
+     //null => in boolean is false
+if(!getSpecificBook){
     return res.json({error: `No book found for the ISBN of ${req.params.isbn}`,});
 }
 
@@ -87,12 +116,14 @@ parameter            category
 Methods              GET 
 */
 
-booky.get("/c/:category", (req, res) => {
-         const getSpecificBook = database.books.filter((book) => 
-         book.category.includes(req.params.category)
-         );
+booky.get("/c/:category", async (req, res) => {
+        
+    const getSpecificBook = await BookModel.findOne({category: req.params.category })
+    //const getSpecificBook = database.books.filter((book) => 
+        // book.category.includes(req.params.category)
+         //);
 
-         if(getSpecificBook.length === 0){
+         if(!getSpecificBook){
             return res.json({error: `No book found for the category of ${req.params.category}`,});
         }
 
@@ -246,14 +277,18 @@ parameter            NONE
 Methods              POST
 */
 
-booky.post("/book/add", (req,res) => {
-//we will use "req.body" to add new book because it is efficent way than using parameter
-    console.log(req.body);
+booky.post("/book/add", async (req,res) => {
+    
+    
+    //we will use "req.body" to add new book because it is efficent way than using parameter
+    // console.log(req.body);
     //we use destucturing style in JS, new book. more benefit
     const {newBook} = req.body;
   
-    database.books.push(newBook);
-    return res.json({ books: database.books});
+    const addNewBook = BookModel.create({newBook});
+    BookModel.create(newBook);
+    //database.books.push(newBook);
+    return res.json({ books:addNewBook, message: "Book was added!!"});
 
     //above code wont work in browser coz broswer only works on GET method
     //we need http client => helper who help you to make http req , like Postman
@@ -269,12 +304,13 @@ Methods              POST
 
 booky.post("/author/add/new", (req, res) => {
     //deconstructing in JS
-    console.log(req.body);
+    //console.log(req.body);
     const {newAuthor} = req.body;
 
+    AuthorModel.create(newAuthor);
     
-    database.authors.push(newAuthor);
-    return res.json({ authors: database.authors});
+    //database.authors.push(newAuthor);
+    return res.json({message: "Author was added"});
 })
 
 ///////////////////////////////////////////POST PUB
@@ -290,7 +326,7 @@ Methods              POST
 
 booky.post("/publication/add/new", (req, res) => {
     //deconstructing in JS
-    console.log(req.body);
+    //console.log(req.body);
     const {newPublication} = req.body;
 
     
@@ -306,24 +342,31 @@ Access               PUBLIC
 parameter            isbn
 Methods              PUT
 */
-booky.put("/book/update/title/:isbn", (req, res)=> {
+booky.put("/book/update/title/:isbn",async (req, res)=> {
     //two methods 1. for each  .. 2.  forEach
 
     //forEach directly update data in database objects
     
     //map will not do it directly, It creat an new array
 
-    database.books.forEach((book) => {
-   if(book.ISBN == req.params.isbn){
+ const updatedData = await BookModel.findOneAndUpdate(
+     {ISBN: req.params.isbn,},
+      {title: req.body.newBookTitle,},
+      {new : true,} //get update data
+      );
+
+
+    //database.books.forEach((book) => {
+   //if(book.ISBN == req.params.isbn){
        //logic search and replace
        //if a match is found in url the book title is changed according to the input from the user
-       book.title = req.body.newBookTitle;
+      // book.title = req.body.newBookTitle;
        //newBookTitle is edited in post man put request
-       return;   
-    }
+       //return;   
+    //}
 
-    });
-  return res.json({books: database.books})
+    
+  return res.json({books: updatedData})
 
 });
 
@@ -336,12 +379,15 @@ Access               PUBLIC
 parameter            isbn
 Methods              PUT
 */
-booky.put("/book/update/author/:isbn/:authorId", (req, res) => {
+booky.put("/book/update/author/:isbn/:authorId", async (req, res) => {
 
     //update book database
 
     // update author database
 
+  
+  /*
+  
     database.books.forEach( (book) =>{
         if(book.ISBN == req.params.isbn){
             //checking if input isbn matches with isbn in books.database
@@ -356,8 +402,19 @@ booky.put("/book/update/author/:isbn/:authorId", (req, res) => {
         };
     });
 
+   */
+         
+     const updatedBook = await BookModel.findOneAndUpdate(
+         {ISBN: req.params.isbn,},
+         {$push: {
+             authors: req.body.newAuthor
+            }
+        },
+        {new : true}
+     )
 
-   return res.json({books: database.books, authors: database.authors});
+
+   return res.json({books: updatedBook});
 
 
 });
@@ -460,3 +517,9 @@ booky.put("/publication/update/book/:isbn", (req, res) => {
 });
 
 booky.listen(3000, () => console.log("Server is runnning in port 3000"));
+
+
+//Talk to mongodb in which mongodb understands => *****
+//talk to us in way we understand => jS
+
+//mongoose take our JS code and convert to file that mongodb understands
